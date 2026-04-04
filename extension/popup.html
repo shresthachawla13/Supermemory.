@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ContextVault</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 380px;
+      min-height: 400px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      padding: 0;
+    }
+
+    .header {
+      background: #1e293b;
+      padding: 20px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header p {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .auth-required {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .auth-required p {
+      color: #cbd5e1;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+
+    .btn-primary:disabled {
+      background: #475569;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+
+    .status {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .status.success {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .page-info {
+      background: #1e293b;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      border: 1px solid #334155;
+    }
+
+    .page-info h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .page-info p {
+      font-size: 12px;
+      color: #94a3b8;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .stat-card {
+      background: #1e293b;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      text-align: center;
+    }
+
+    .stat-card .number {
+      font-size: 24px;
+      font-weight: 700;
+      color: #3b82f6;
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .spinner {
+      border: 2px solid #334155;
+      border-top: 2px solid #3b82f6;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .link {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .link:hover {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+      ContextVault
+    </h1>
+    <p>Semantic memory for the web</p>
+  </div>
+
+  <div class="content">
+    <div id="authRequired" class="auth-required hidden">
+      <p>Sign in to start saving content</p>
+      <button class="btn btn-primary" id="openAppBtn">Open ContextVault</button>
+    </div>
+
+    <div id="mainContent" class="hidden">
+      <div id="statusMessage" class="status hidden"></div>
+
+      <div id="pageInfo" class="page-info">
+        <h3 id="pageTitle">Loading...</h3>
+        <p id="pageUrl">Loading...</p>
+      </div>
+
+      <button class="btn btn-primary" id="captureBtn">
+        Save to Vault
+      </button>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="number" id="totalItems">-</div>
+          <div class="label">Items Saved</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="todayItems">-</div>
+          <div class="label">Today</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
